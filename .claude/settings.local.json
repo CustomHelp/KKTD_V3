@@ -1,7 +1,19 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(Get-ChildItem 'C:\\\\CHP\\\\KKTD_V3' -Recurse -File | Select-Object @{n='Rel';e={$_.FullName.Substring\\('C:\\\\CHP\\\\KKTD_V3\\\\'.Length\\)}} | Sort-Object Rel | Format-Table -AutoSize -Wrap)"
+      "PowerShell(Get-ChildItem 'C:\\\\CHP\\\\KKTD_V3' -Recurse -File | Select-Object @{n='Rel';e={$_.FullName.Substring\\('C:\\\\CHP\\\\KKTD_V3\\\\'.Length\\)}} | Sort-Object Rel | Format-Table -AutoSize -Wrap)",
+      "Bash(ls \"C:/Programme/IDS/ids_peak/generic_sdk/api/lib/x86_64/\")",
+      "Bash(ls \"C:/Programme/IDS/ids_peak/generic_sdk/samples/\")",
+      "Read(//c/Program Files/IDS/ids_peak/**)",
+      "Read(//c//**)",
+      "Bash(ls \"C:/Programme/IDS/ids_peak/.util/\")",
+      "Bash(cat \"C:/Programme/IDS/ids_peak/version.txt\")",
+      "PowerShell(dotnet nuget locals *)",
+      "Bash(ls \"C:/Users/Administrator/.nuget/packages/idsimaging.peak.api/1.13.0.1/ref/netstandard2.0/\")",
+      "Bash(ls \"C:/Users/Administrator/.nuget/packages/idsimaging.peak.api/1.13.0.1/runtimes/win-x64/\")",
+      "Bash(ls \"C:/Users/Administrator/.nuget/packages/idsimaging.peak.api/1.13.0.1/runtimes/win-x64/lib/\")",
+      "Bash(ls \"C:/Users/Administrator/.nuget/packages/idsimaging.peak.api/1.13.0.1/runtimes/win-x64/native/\")",
+      "PowerShell(dotnet build *)"
     ]
   }
 }

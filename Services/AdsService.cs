@@ -8,6 +8,9 @@ namespace KKTD_V3.Services;
 
 /// <summary>
 /// Lokale TwinCAT-ADS-Verbindung: Encoder lesen, Ausschleuser/Geschwindigkeit/Dichte schreiben.
+/// Bricht beim Verbinden nicht ab, wenn Variablen (noch) nicht im PLC-Symbolverzeichnis sind —
+/// fehlende Handles bleiben 0 und die zugehörigen Reads/Writes werden im Log gemeldet, statt
+/// die Anwendung zu killen.
 /// </summary>
 public sealed class AdsService : IDisposable
 {
@@ -19,7 +22,12 @@ public sealed class AdsService : IDisposable
     private uint _speedHandle;
     private uint _densityHandle;
     private readonly uint[] _ejectorHandles = new uint[6];
+
     private bool _connected;
+    private bool _encoderResolved;
+    private bool _speedResolved;
+    private bool _densityResolved;
+    private readonly bool[] _ejectorResolved = new bool[6];
 
     public AdsService(AppSettings settings, ILogger<AdsService> logger)
     {
@@ -33,45 +41,91 @@ public sealed class AdsService : IDisposable
     {
         if (_connected) return;
 
-        var amsId = AmsNetId.Parse(_settings.Ads.AmsNetId);
-        _client.Connect(amsId, _settings.Ads.Port);
-
-        _encoderHandle = _client.CreateVariableHandle(_settings.Ads.EncoderVariableName);
-        _speedHandle = _client.CreateVariableHandle(_settings.Ads.SpeedVariableName);
-        _densityHandle = _client.CreateVariableHandle(_settings.Ads.DensityVariableName);
-        for (int i = 0; i < _ejectorHandles.Length; i++)
+        try
         {
-            _ejectorHandles[i] = _client.CreateVariableHandle($"{_settings.Ads.EjectorVariablePrefix}{i + 1}");
+            var amsId = AmsNetId.Parse(_settings.Ads.AmsNetId);
+            _client.Connect(amsId, _settings.Ads.Port);
+            _connected = true;
+            _logger.LogInformation("ADS verbunden — {AmsNetId}:{Port}.",
+                _settings.Ads.AmsNetId, _settings.Ads.Port);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex,
+                "ADS-Verbindung zu {AmsNetId}:{Port} fehlgeschlagen — Anwendung läuft ohne Encoder/Ausschleuser weiter.",
+                _settings.Ads.AmsNetId, _settings.Ads.Port);
+            return;
         }
 
-        _connected = true;
-        _logger.LogInformation("ADS verbunden — {AmsNetId}:{Port}.", _settings.Ads.AmsNetId, _settings.Ads.Port);
+        _encoderResolved = TryCreateHandle(_settings.Ads.EncoderVariableName, out _encoderHandle);
+        _speedResolved = TryCreateHandle(_settings.Ads.SpeedVariableName, out _speedHandle);
+        _densityResolved = TryCreateHandle(_settings.Ads.DensityVariableName, out _densityHandle);
+
+        for (int i = 0; i < _ejectorHandles.Length; i++)
+        {
+            _ejectorResolved[i] = TryCreateHandle(
+                $"{_settings.Ads.EjectorVariablePrefix}{i + 1}",
+                out _ejectorHandles[i]);
+        }
+    }
+
+    private bool TryCreateHandle(string symbolName, out uint handle)
+    {
+        try
+        {
+            handle = _client.CreateVariableHandle(symbolName);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            handle = 0;
+            _logger.LogWarning("ADS-Symbol {Symbol} nicht gefunden ({Reason}) — wird übersprungen.",
+                symbolName, ex.Message);
+            return false;
+        }
     }
 
     public double ReadEncoderMm()
     {
-        EnsureConnected();
-        return _client.ReadAny<double>(_encoderHandle);
+        if (!_connected || !_encoderResolved) return 0;
+        try
+        {
+            return _client.ReadAny<double>(_encoderHandle);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "ADS-Encoder-Read fehlgeschlagen.");
+            return 0;
+        }
     }
 
     public void SetEjector(int laneOneBased, bool open)
     {
-        EnsureConnected();
         if (laneOneBased < 1 || laneOneBased > _ejectorHandles.Length)
             throw new ArgumentOutOfRangeException(nameof(laneOneBased));
-        _client.WriteAny(_ejectorHandles[laneOneBased - 1], open);
+        if (!_connected || !_ejectorResolved[laneOneBased - 1]) return;
+        try
+        {
+            _client.WriteAny(_ejectorHandles[laneOneBased - 1], open);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "ADS-Ejector-Write Bahn {Lane} fehlgeschlagen.", laneOneBased);
+        }
     }
 
     public void SetConveyorSpeed(double mmPerSec)
     {
-        EnsureConnected();
-        _client.WriteAny(_speedHandle, mmPerSec);
+        if (!_connected || !_speedResolved) return;
+        try { _client.WriteAny(_speedHandle, mmPerSec); }
+        catch (Exception ex) { _logger.LogWarning(ex, "ADS-Speed-Write fehlgeschlagen."); }
     }
 
     public void SetRequestedDensity(double density)
     {
-        EnsureConnected();
-        _client.WriteAny(_densityHandle, density);
+        if (!_connected || !_densityResolved) return;
+        try { _client.WriteAny(_densityHandle, density); }
+        catch (Exception ex) { _logger.LogWarning(ex, "ADS-Density-Write fehlgeschlagen."); }
     }
 
     public Task DisconnectAsync()
@@ -80,12 +134,6 @@ public sealed class AdsService : IDisposable
         try { _client.Disconnect(); } catch { /* ignore */ }
         _connected = false;
         return Task.CompletedTask;
-    }
-
-    private void EnsureConnected()
-    {
-        if (!_connected)
-            throw new InvalidOperationException("ADS nicht verbunden. Connect() zuerst aufrufen.");
     }
 
     public void Dispose()

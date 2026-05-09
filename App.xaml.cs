@@ -26,7 +26,7 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        var logDir = Path.Combine(AppContext.BaseDirectory, "Logs");
+        const string logDir = @"C:\CHP\Logs";
         Directory.CreateDirectory(logDir);
 
         Log.Logger = new LoggerConfiguration()
@@ -35,7 +35,8 @@ public partial class App : Application
             .WriteTo.File(
                 Path.Combine(logDir, "kktd-.log"),
                 rollingInterval: RollingInterval.Day,
-                retainedFileCountLimit: 30)
+                retainedFileCountLimit: 30,
+                shared: true)
             .CreateLogger();
 
         Host = Microsoft.Extensions.Hosting.Host

@@ -16,12 +16,17 @@
         <!-- Live-Bild -->
         <Border Background="#0B1220" Margin="8" CornerRadius="4">
             <Grid>
-                <Image x:Name="LiveImage" Stretch="Uniform" />
+                <!-- Headline liegt unter dem Image; sobald LiveBitmap gesetzt ist,
+                     deckt das Image den Text mit Stretch=Uniform ab. -->
                 <TextBlock Text="{Binding HeadlineText}"
                            Foreground="#9CA3AF"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
                            FontSize="16" />
+                <Image x:Name="LiveImage"
+                       Stretch="Uniform"
+                       RenderOptions.BitmapScalingMode="LowQuality"
+                       Source="{Binding LiveBitmap}" />
             </Grid>
         </Border>
 
