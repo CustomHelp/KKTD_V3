@@ -61,10 +61,12 @@ public partial class App : Application
 
                 // Processing pipeline
                 services.AddSingleton<FlatFieldService>();
+                services.AddSingleton<ForegroundDetector>();
                 services.AddSingleton<AreaMatcher>();
                 services.AddSingleton<PyramidMatcher>();
                 services.AddSingleton<ContourMatcher>();
                 services.AddSingleton<ImageProcessingService>();
+                services.AddSingleton<SampleStorageService>();
 
                 // Ejector / Conveyor
                 services.AddSingleton<EjectorService>();

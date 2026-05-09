@@ -13,20 +13,42 @@
             <ColumnDefinition Width="360" />
         </Grid.ColumnDefinitions>
 
-        <!-- Live-Bild -->
-        <Border Background="#0B1220" Margin="8" CornerRadius="4">
+        <!-- Live-Bild + Bounding-Box-Overlay -->
+        <Border Background="#0B1220" Margin="8" CornerRadius="4" ClipToBounds="True">
             <Grid>
-                <!-- Headline liegt unter dem Image; sobald LiveBitmap gesetzt ist,
-                     deckt das Image den Text mit Stretch=Uniform ab. -->
+                <!-- Headline liegt hinter dem Image; sobald LiveBitmap kommt deckt es ihn ab. -->
                 <TextBlock Text="{Binding HeadlineText}"
                            Foreground="#9CA3AF"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
                            FontSize="16" />
-                <Image x:Name="LiveImage"
-                       Stretch="Uniform"
-                       RenderOptions.BitmapScalingMode="LowQuality"
-                       Source="{Binding LiveBitmap}" />
+                <Viewbox Stretch="Uniform">
+                    <Grid Width="{Binding ImageWidth}" Height="{Binding ImageHeight}">
+                        <Image Source="{Binding LiveBitmap}"
+                               Stretch="Fill"
+                               RenderOptions.BitmapScalingMode="LowQuality" />
+                        <ItemsControl ItemsSource="{Binding Detections}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas IsItemsHost="True" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding BoundingBox.X}" />
+                                    <Setter Property="Canvas.Top"  Value="{Binding BoundingBox.Y}" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Rectangle Stroke="Lime" StrokeThickness="8"
+                                               Width="{Binding BoundingBox.Width}"
+                                               Height="{Binding BoundingBox.Height}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Viewbox>
             </Grid>
         </Border>
 
@@ -53,8 +75,40 @@
                 <Button Content="Stop"  Command="{Binding StopCommand}"  Padding="12,6" />
             </StackPanel>
 
+            <Border Background="#F3F4F6" Padding="12" CornerRadius="4" Margin="0,0,0,8">
+                <StackPanel>
+                    <TextBlock Text="Flat-Field" FontWeight="Bold" />
+                    <TextBlock Text="{Binding FlatFieldStatus}" Margin="0,4,0,0" />
+                    <CheckBox Content="Korrektur live anzeigen"
+                              IsChecked="{Binding FlatFieldEnabled}"
+                              Margin="0,8,0,0" />
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <Button Content="Referenz aufnehmen"
+                                Command="{Binding CaptureFlatFieldCommand}"
+                                Padding="10,6" Margin="0,0,8,0" />
+                        <Button Content="Verwerfen"
+                                Command="{Binding ClearFlatFieldCommand}"
+                                Padding="10,6" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Background="#F3F4F6" Padding="12" CornerRadius="4" Margin="0,0,0,8">
+                <StackPanel>
+                    <TextBlock Text="Detektion" FontWeight="Bold" />
+                    <TextBlock Text="{Binding DetectionStatus}" Margin="0,4,0,0" />
+                    <CheckBox Content="Bounding-Boxes anzeigen"
+                              IsChecked="{Binding DetectionEnabled}"
+                              Margin="0,8,0,0" />
+                    <Button Content="Bild speichern"
+                            Command="{Binding SaveSampleCommand}"
+                            Padding="10,6" Margin="0,8,0,0"
+                            HorizontalAlignment="Left" />
+                </StackPanel>
+            </Border>
+
             <TextBlock Text="Letzte Erkennungen" FontWeight="Bold" Margin="0,8,0,4" />
-            <ListBox ItemsSource="{Binding RecentResults}" Height="400">
+            <ListBox ItemsSource="{Binding RecentResults}" Height="280">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
