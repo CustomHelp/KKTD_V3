@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem 'C:\\\\CHP\\\\KKTD_V3' -Recurse -File | Select-Object @{n='Rel';e={$_.FullName.Substring\\('C:\\\\CHP\\\\KKTD_V3\\\\'.Length\\)}} | Sort-Object Rel | Format-Table -AutoSize -Wrap)"
+    ]
+  }
+}

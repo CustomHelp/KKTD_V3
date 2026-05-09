@@ -1,0 +1,71 @@
+<UserControl x:Class="KKTD_V3.Views.LiveView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:KKTD_V3.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:LiveViewModel}"
+             d:DesignHeight="700" d:DesignWidth="1400">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="360" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Live-Bild -->
+        <Border Background="#0B1220" Margin="8" CornerRadius="4">
+            <Grid>
+                <Image x:Name="LiveImage" Stretch="Uniform" />
+                <TextBlock Text="{Binding HeadlineText}"
+                           Foreground="#9CA3AF"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="16" />
+            </Grid>
+        </Border>
+
+        <!-- Right pane -->
+        <StackPanel Grid.Column="1" Margin="0,8,8,8">
+            <Border Background="#F3F4F6" Padding="12" CornerRadius="4" Margin="0,0,0,8">
+                <StackPanel>
+                    <TextBlock Text="Status" FontWeight="Bold" />
+                    <TextBlock Text="{Binding HeadlineText}" Margin="0,4,0,0" />
+                    <TextBlock Margin="0,8,0,0">
+                        <Run Text="Frames: " /><Run Text="{Binding FrameCount}" />
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="FPS: " /><Run Text="{Binding Fps, StringFormat=F1}" />
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="Zykluszeit: " /><Run Text="{Binding LastProcessingTimeMs, StringFormat=F1}" /> ms
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <Button Content="Start" Command="{Binding StartCommand}" Padding="12,6" Margin="0,0,8,0" />
+                <Button Content="Stop"  Command="{Binding StopCommand}"  Padding="12,6" />
+            </StackPanel>
+
+            <TextBlock Text="Letzte Erkennungen" FontWeight="Bold" Margin="0,8,0,4" />
+            <ListBox ItemsSource="{Binding RecentResults}" Height="400">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock>
+                                <Run Text="Bahn " /><Run Text="{Binding Lane}" />
+                                <Run Text=" Zone " /><Run Text="{Binding Zone}" />
+                                <Run Text=" — " /><Run Text="{Binding Verdict}" />
+                            </TextBlock>
+                            <TextBlock Foreground="#6B7280">
+                                <Run Text="Score: " /><Run Text="{Binding Score, StringFormat=F2}" />
+                                <Run Text="  Fläche: " /><Run Text="{Binding AreaPx}" /><Run Text=" px" />
+                            </TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+    </Grid>
+</UserControl>

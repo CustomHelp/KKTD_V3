@@ -1,0 +1,21 @@
+<UserControl x:Class="KKTD_V3.Views.CatalogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:KKTD_V3.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:CatalogViewModel}"
+             d:DesignHeight="700" d:DesignWidth="1400">
+    <DockPanel Margin="16">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,12">
+            <TextBlock Text="Artikelkatalog" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" />
+            <Button Content="Neu laden"
+                    Command="{Binding RefreshCommand}"
+                    Padding="12,6"
+                    Margin="16,0,0,0" />
+        </StackPanel>
+        <ListBox ItemsSource="{Binding ArticleNumbers}"
+                 SelectedItem="{Binding SelectedArticle, Mode=TwoWay}" />
+    </DockPanel>
+</UserControl>

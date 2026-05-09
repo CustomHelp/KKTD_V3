@@ -1,0 +1,54 @@
+## Visual Studio
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.cache
+*.log
+*.tlog
+*.tlog.*
+*.lastbuildstate
+
+## Build output
+[Dd]ebug/
+[Rr]elease/
+[Bb]uild/
+[Bb]uilds/
+x64/
+x86/
+[Oo]ut/
+
+## Rider / ReSharper
+.idea/
+*.DotSettings.user
+
+## NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Generated
+*.g.cs
+*.g.i.cs
+*.AssemblyAttributes.cs
+
+## OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+## Local config / secrets
+*.local.ini
+appsettings.Development.json
+
+## Runtime data (Artikel, Templates, Bilder)
+Articles/
+Images/
+Logs/

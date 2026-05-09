@@ -1,0 +1,69 @@
+<UserControl x:Class="KKTD_V3.Views.TeachView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:KKTD_V3.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:TeachViewModel}"
+             d:DesignHeight="700" d:DesignWidth="1400">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="640" Margin="24" HorizontalAlignment="Left">
+            <TextBlock Text="Teach-In" FontSize="22" FontWeight="Bold" Margin="0,0,0,12" />
+
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Artikelnummer" VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" Text="{Binding ArticleNumber, UpdateSourceTrigger=PropertyChanged}" />
+            </Grid>
+
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Bezeichnung" VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" Text="{Binding ArticleName, UpdateSourceTrigger=PropertyChanged}" />
+            </Grid>
+
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Länge (mm)" VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" Text="{Binding PartLengthMm, UpdateSourceTrigger=PropertyChanged}" />
+            </Grid>
+
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Breite (mm)" VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" Text="{Binding PartWidthMm, UpdateSourceTrigger=PropertyChanged}" />
+            </Grid>
+
+            <CheckBox Content="Teil kann stehen"
+                      IsChecked="{Binding CanStand, Mode=TwoWay}"
+                      Margin="180,4,0,12" />
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                <Button Content="Zonen berechnen"
+                        Command="{Binding RecalculateCommand}"
+                        Padding="12,6" Margin="0,0,8,0" />
+                <Button Content="Speichern"
+                        Command="{Binding SaveCommand}"
+                        Padding="12,6" />
+            </StackPanel>
+
+            <TextBlock>
+                <Run Text="Zonen: " /><Run Text="{Binding ZoneCount}" />
+            </TextBlock>
+            <TextBlock Text="{Binding StatusText}" Foreground="#6B7280" Margin="0,4,0,0" />
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
